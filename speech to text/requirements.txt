@@ -1,0 +1,11 @@
+# Speech Recognition
+SpeechRecognition>=3.10.0
+
+# Audio Processing
+PyAudio>=0.2.13
+
+# GUI (included in Python standard library, but listed for reference)
+# tkinter - comes with Python
+
+# Optional: For better audio handling
+pocketsphinx>=5.0.0
