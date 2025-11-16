@@ -1,0 +1,141 @@
+/* Styles for Meet Translator Panel */
+
+#meet-translator-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 280px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#translation-overlay {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999 !important;
+  pointer-events: none;
+  max-width: 90%;
+  width: auto;
+}
+
+.live-text {
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  padding: 20px 40px;
+  border-radius: 12px;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+  display: none;
+  text-align: center;
+  line-height: 1.5;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  min-width: 300px;
+}
+
+#sign-live {
+  background: rgba(102, 126, 234, 0.95);
+  border-color: rgba(118, 75, 162, 0.5);
+}
+
+#speech-live {
+  background: rgba(46, 204, 113, 0.95);
+  border-color: rgba(39, 174, 96, 0.5);
+}
+
+.translator-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.translator-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+#close-panel {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+#close-panel:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.translator-controls {
+  padding: 15px;
+  display: flex;
+  gap: 8px;
+  background: #f8f9fa;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.control-btn:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.control-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.control-btn .icon {
+  font-size: 24px;
+}
+
+.control-btn .label {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.control-btn .status {
+  font-size: 10px;
+  padding: 2px 8px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.control-btn.active .status {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+
