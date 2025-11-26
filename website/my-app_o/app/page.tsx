@@ -1,12 +1,16 @@
 'use client';
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import UserAuth from "../components/UserAuth";
 
 export default function Home() {
   const [isTranslating, setIsTranslating] = useState(false);
   const [translation, setTranslation] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [speechText, setSpeechText] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const startTranslation = async () => {
     try {
@@ -59,6 +63,51 @@ export default function Home() {
     setTimeout(processFrames, 300);
   };
 
+  const startSpeechRecognition = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Speech recognition not supported in this browser');
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    
+    recognitionRef.current.continuous = true;
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.lang = 'en-US';
+
+    recognitionRef.current.onstart = () => {
+      setIsListening(true);
+      setSpeechText('Listening...');
+    };
+
+    recognitionRef.current.onresult = (event: any) => {
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        setSpeechText(finalTranscript);
+      }
+    };
+
+    recognitionRef.current.onerror = () => {
+      setSpeechText('Error occurred in recognition');
+      setIsListening(false);
+    };
+
+    recognitionRef.current.start();
+  };
+
+  const stopSpeechRecognition = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
   useEffect(() => {
     if (isTranslating) processFrames();
   }, [isTranslating]);
@@ -82,9 +131,12 @@ export default function Home() {
           <Image src="/logo.jpeg" alt="Deafon" width={120} height={120} className="rounded-2xl mx-auto mb-8 shadow-2xl" />
           <h2 className="text-6xl font-bold text-white mb-6">Real-Time Translation for Google Meet</h2>
           <p className="text-2xl text-white/90 mb-8">Sign Language & Speech-to-Text for Chrome & Firefox</p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap">
             <a href="#translator" className="bg-white text-[#aa1b1b] px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition">
-              Try Translator
+              Try Sign Language
+            </a>
+            <a href="#speech-recognition" className="bg-white text-[#aa1b1b] px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition">
+              Try Speech Recognition
             </a>
             <a href="#install" className="bg-white/20 backdrop-blur text-white px-8 py-4 rounded-full text-lg font-semibold border-2 border-white/30 hover:bg-white/30 transition">
               Install Extension
@@ -130,7 +182,80 @@ export default function Home() {
           </div>
         </div>
 
-        <div id="features" className="grid md:grid-cols-2 gap-8 mb-20">
+        <div id="speech-recognition" className="bg-white rounded-2xl p-8 mb-20 shadow-2xl">
+          <h3 className="text-3xl font-bold text-[#aa1b1b] mb-6 text-center">Try Speech Recognition</h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <div className="bg-gradient-to-br from-[#aa1b1b]/10 to-[#8a1515]/10 rounded-xl p-8 text-center">
+                <div className="text-8xl mb-4">{isListening ? '🎤' : '🔇'}</div>
+                <p className="text-lg text-gray-600 mb-6">
+                  {isListening ? 'Listening to your voice...' : 'Click to start speech recognition'}
+                </p>
+                <div className="flex gap-4 justify-center">
+                  {!isListening ? (
+                    <button onClick={startSpeechRecognition} className="bg-[#aa1b1b] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#8a1515] transition">
+                      🎤 Start Listening
+                    </button>
+                  ) : (
+                    <button onClick={stopSpeechRecognition} className="bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition">
+                      ⏹️ Stop Listening
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="bg-gray-50 rounded-xl p-6 h-full">
+                <h4 className="text-xl font-bold text-[#aa1b1b] mb-4">Speech to Text Output:</h4>
+                <div className="bg-white rounded-lg p-6 min-h-[200px] border-2 border-[#aa1b1b]/20">
+                  {speechText ? (
+                    <p className="text-lg text-gray-800">{speechText}</p>
+                  ) : (
+                    <p className="text-gray-400 italic">Start speaking to see transcription...</p>
+                  )}
+                </div>
+                <p className="text-sm text-gray-600 mt-4">
+                  💡 Uses Web Speech API - works best in Chrome/Edge browsers
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="user-auth" className="mb-20">
+          <UserAuth />
+        </div>
+
+        <div id="content-upload" className="bg-white rounded-2xl p-8 mb-20 shadow-2xl">
+          <h3 className="text-3xl font-bold text-[#aa1b1b] mb-6 text-center">Content Upload & Conversion Module</h3>
+          <div className="bg-gradient-to-br from-[#aa1b1b]/10 to-[#8a1515]/10 rounded-xl p-8 text-center">
+            <div className="text-6xl mb-4">📁</div>
+            <h4 className="text-2xl font-bold text-gray-800 mb-4">Coming Soon - Major Feature</h4>
+            <p className="text-lg text-gray-600 mb-6">
+              Upload audio/video files and convert them to text with sign language interpretation. 
+              This major module will support multiple file formats and provide batch processing capabilities.
+            </p>
+            <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-2 justify-center">
+                <span className="text-blue-500">🎵</span>
+                <span>Audio file conversion</span>
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <span className="text-blue-500">🎬</span>
+                <span>Video file processing</span>
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <span className="text-blue-500">📊</span>
+                <span>Batch processing</span>
+              </div>
+            </div>
+            <button className="mt-6 bg-gray-400 text-white px-8 py-3 rounded-lg font-semibold cursor-not-allowed" disabled>
+              Under Development
+            </button>
+          </div>
+        </div>
+
+        <div id="features" className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
             <div className="text-5xl mb-4">👋</div>
             <h3 className="text-2xl font-bold text-white mb-3">Sign Language Recognition</h3>
@@ -142,6 +267,11 @@ export default function Home() {
             <p className="text-white/90">Automatic speech recognition that converts spoken words to text in real-time during your meetings.</p>
           </div>
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
+            <div className="text-5xl mb-4">👤</div>
+            <h3 className="text-2xl font-bold text-white mb-3">User Authentication</h3>
+            <p className="text-white/90">Secure login system with profile management, preferences, and personalized settings for each user.</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
             <div className="text-5xl mb-4">💬</div>
             <h3 className="text-2xl font-bold text-white mb-3">Live Conversation Dialog</h3>
             <p className="text-white/90">View full conversation history with timestamps. All translations appear on-screen during your meeting.</p>
@@ -150,6 +280,11 @@ export default function Home() {
             <div className="text-5xl mb-4">💾</div>
             <h3 className="text-2xl font-bold text-white mb-3">Save Transcripts</h3>
             <p className="text-white/90">Download complete meeting transcripts with one click. Never miss important details from your conversations.</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
+            <div className="text-5xl mb-4">📁</div>
+            <h3 className="text-2xl font-bold text-white mb-3">Content Upload & Conversion</h3>
+            <p className="text-white/90">Upload audio/video files for batch processing and conversion to text with sign language interpretation.</p>
           </div>
         </div>
 
